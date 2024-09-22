@@ -1,21 +1,24 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class GroundCheck : MonoBehaviour
+namespace Com.Player.GroundCheck
 {
-    public bool is_Ground = true;
-    public float distance = 1.5f;
-    public LayerMask layer;
-
-    public bool IsGrounded()
+    public class GroundCheck : MonoBehaviour
     {
-        return Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, distance, layer);
-    }
+        public bool is_Ground = true;
+        public float distance = 1.5f;
+        public LayerMask layer;
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, Vector3.down * distance);
-    }
+        public bool IsGrounded()
+        {
+            return Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, distance, layer);
+        }
 
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawRay(transform.position, Vector3.down * distance);
+        }
+
+    }
 }

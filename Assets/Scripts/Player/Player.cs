@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using Com.Player.GroundCheck;
 public class Player : MonoBehaviour
 {
     public float speed;
@@ -45,7 +45,7 @@ public class Player : MonoBehaviour
                 velocity.x = Mathf.Lerp(velocity.x, 0, moveFriction * Time.deltaTime);
                 velocity.z = Mathf.Lerp(velocity.z, 0, moveFriction * Time.deltaTime);
             }
-            rb.linearVelocity = new Vector3(velocity.x, rb.linearVelocity.y, velocity.z);
         }
+        rb.linearVelocity = new Vector3(velocity.x, rb.linearVelocity.y, velocity.z);
     }
 }
