@@ -1,15 +1,18 @@
 using UnityEngine;
-using Com.Player.GroundCheck;
+
 public class Player : MonoBehaviour
 {
-    public float speed;
+    private float speed;
     public float moveSpeed = 550f;
     public float moveFriction = 15f;
+
+    public float jumpForce;
 
     Rigidbody rb;
     public GroundCheck check;
     public Vector3 velocity;
 
+    public Transform camRoot;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,23 +25,29 @@ public class Player : MonoBehaviour
     void Update()
     {
         MovementHandle();
+        JumpHandle();
+    }
+
+    void JumpHandle()
+    {
+        if (check.is_Ground && Input.GetButtonDown("Jump"))
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
     }
 
     void MovementHandle()
     {
         Vector2 inputDir = new Vector2( Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-        if (!check.IsGrounded())
-        {
-            velocity.y -= 9.8f * Time.deltaTime;
-        }
+        
 
-        if (check.IsGrounded())
+        if (check.is_Ground)
         {
             if (inputDir != Vector2.zero)
             {
-                velocity.x = Mathf.Lerp(velocity.x, transform.forward.z * inputDir.x * speed, 5);
-                velocity.z = Mathf.Lerp(velocity.z, transform.forward.z * inputDir.y * speed, 5);
+                velocity.x = Mathf.Lerp(velocity.x, inputDir.x * speed, 5);
+                velocity.z = Mathf.Lerp(velocity.z, inputDir.y * speed, 5);
             }
             else 
             {
@@ -46,6 +55,6 @@ public class Player : MonoBehaviour
                 velocity.z = Mathf.Lerp(velocity.z, 0, moveFriction * Time.deltaTime);
             }
         }
-        rb.linearVelocity = new Vector3(velocity.x, rb.linearVelocity.y, velocity.z);
+        rb.linearVelocity = transform.rotation * new Vector3( velocity.x, rb.linearVelocity.y, velocity.z);
     }
 }
