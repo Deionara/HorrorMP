@@ -2,59 +2,60 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private float speed;
-    public float moveSpeed = 550f;
-    public float moveFriction = 15f;
+    public Transform Camera;
+    public CharacterController Controller;
 
+    public float speed;
     public float jumpForce;
+    public float sens = 0.2f;
+    private float gravity = -9.81f;
 
-    Rigidbody rb;
-    public GroundCheck check;
-    public Vector3 velocity;
+    Vector3 InputMovement;
+    Vector2 InputMouse;
+    [SerializeField] Vector3 Velocity;
+    private float xRot;
 
-    public Transform camRoot;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
-        rb = GetComponent<Rigidbody>();
-
-        speed = moveSpeed;
+        
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        MovementHandle();
-        JumpHandle();
+        InputMovement = new Vector3(Input.GetAxis("Horizontal"), 0,Input.GetAxis("Vertical"));
+        InputMouse = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+
+        Movement();
+        MoveCamera();
     }
 
-    void JumpHandle()
+    void Movement()
     {
-        if (check.is_Ground && Input.GetButtonDown("Jump"))
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
-    }
-
-    void MovementHandle()
-    {
-        Vector2 inputDir = new Vector2( Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        Vector3 MoveVector = transform.TransformDirection(InputMovement);
 
         
 
-        if (check.is_Ground)
+        if (Controller.isGrounded)
         {
-            if (inputDir != Vector2.zero)
+            Velocity.y = -1;
+
+            if (Input.GetButtonDown("Jump"))
             {
-                velocity.x = Mathf.Lerp(velocity.x, inputDir.x * speed, 5);
-                velocity.z = Mathf.Lerp(velocity.z, inputDir.y * speed, 5);
-            }
-            else 
-            {
-                velocity.x = Mathf.Lerp(velocity.x, 0, moveFriction * Time.deltaTime);
-                velocity.z = Mathf.Lerp(velocity.z, 0, moveFriction * Time.deltaTime);
+                Velocity.y = jumpForce;
             }
         }
-        rb.linearVelocity = transform.rotation * new Vector3( velocity.x, rb.linearVelocity.y, velocity.z);
+        else
+            Velocity.y -= gravity * -2f * Time.deltaTime;
+
+        Controller.Move(MoveVector * speed * Time.deltaTime);
+        Controller.Move(Velocity * Time.deltaTime);
+    }
+
+    void MoveCamera()
+    {
+        xRot -= InputMouse.y * sens;
+
+        transform.Rotate(0, InputMouse.x * sens, 0);
+        Camera.transform.localRotation = Quaternion.Euler(xRot, 0, 0);
     }
 }
